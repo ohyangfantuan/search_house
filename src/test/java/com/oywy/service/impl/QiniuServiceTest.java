@@ -34,6 +34,9 @@ public class QiniuServiceTest extends SearchhouseApplicationTests {
 
     @Test
     public void delete() throws Exception {
+        String key = "FnM0Y1JCp-RKIDKxgeyaq4bhHEiC";
+        Response response = qiniuService.delete(key);
+        assertTrue(response.isOK());
     }
 
 }

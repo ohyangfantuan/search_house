@@ -47,12 +47,22 @@ public class QiniuServiceImpl implements QiniuService {
 
     @Override
     public Response uploadFile(InputStream inputStream) throws QiniuException {
-        return null;
+        Response response = uploadManager.put(inputStream, null, getUploadToken(), null, null);
+        //尝试三次
+        int retry = 3;
+        while (response.needRetry() && retry-- < 3)
+            response = uploadManager.put(inputStream, null, getUploadToken(), null, null);
+        return response;
     }
 
     @Override
     public Response delete(String key) throws QiniuException {
-        return null;
+        Response response = bucketManager.delete(bucket, key);
+        //尝试三次
+        int retry = 3;
+        while (response.needRetry() && retry-- < 3)
+            response = bucketManager.delete(bucket, key);
+        return response;
     }
 
     /**
@@ -61,7 +71,6 @@ public class QiniuServiceImpl implements QiniuService {
      * @return
      */
     private String getUploadToken() {
-        System.out.println(putPolicy.get("returnBody"));
         return auth.uploadToken(bucket, null, 3600, putPolicy);
     }
 }

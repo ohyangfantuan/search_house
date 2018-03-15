@@ -1,5 +1,7 @@
 package com.oywy.core.common;
 
+import com.oywy.core.enumeration.ResponseStatusEnum;
+
 /**
  * 接口返回数据
  * Created by oywy on 2018/3/14.
@@ -18,48 +20,22 @@ public class ApiResponse {
     }
 
     public static ApiResponse success() {
-        return new ApiResponse(Status.SUCCESS.code, Status.SUCCESS.getStandardMessage(), null, false);
+        return new ApiResponse(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getStandardMessage(), null, false);
+    }
+
+    public static ApiResponse success(Object data) {
+        return new ApiResponse(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getStandardMessage(), data, false);
     }
 
     public static ApiResponse message(int code, String message) {
         return new ApiResponse(code, message, null, false);
     }
 
-    public static ApiResponse status(Status status) {
+    public static ApiResponse status(ResponseStatusEnum status) {
         return new ApiResponse(status.getCode(), status.getStandardMessage(), null, false);
     }
 
-    public enum Status {
-        SUCCESS(200, "成功"),
-        BAD_REQUEST(400, "请求无效"),
-        INTERNAL_SERVER_ERROR(500, "服务器错误"),
-        NOT_VALID_PARAM(40005, "参数无效"),
-        NOT_SUPPORTED_OPERATION(40006, "操作不支持"),
-        NOT_LOGIN(50000, "未登录");
-        private int code;
-        private String standardMessage;
 
-        Status(int code, String standardMessage) {
-            this.code = code;
-            this.standardMessage = standardMessage;
-        }
-
-        public int getCode() {
-            return code;
-        }
-
-        public void setCode(int code) {
-            this.code = code;
-        }
-
-        public String getStandardMessage() {
-            return standardMessage;
-        }
-
-        public void setStandardMessage(String standardMessage) {
-            this.standardMessage = standardMessage;
-        }
-    }
 
     public int getCode() {
         return code;
