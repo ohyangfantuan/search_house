@@ -19,6 +19,16 @@ public class ApiResponse {
         this.more = more;
     }
 
+    public ApiResponse(int code, String message, Object data) {
+        this.code = code;
+        this.message = message;
+        this.data = data;
+    }
+
+    public ApiResponse(ResponseStatusEnum status) {
+        this(status.getCode(), status.getStandardMessage(), null, false);
+    }
+
     public static ApiResponse success() {
         return new ApiResponse(ResponseStatusEnum.SUCCESS.getCode(), ResponseStatusEnum.SUCCESS.getStandardMessage(), null, false);
     }
@@ -34,7 +44,6 @@ public class ApiResponse {
     public static ApiResponse status(ResponseStatusEnum status) {
         return new ApiResponse(status.getCode(), status.getStandardMessage(), null, false);
     }
-
 
 
     public int getCode() {

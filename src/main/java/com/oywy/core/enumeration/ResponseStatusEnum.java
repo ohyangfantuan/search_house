@@ -6,6 +6,7 @@ package com.oywy.core.enumeration;
 public enum ResponseStatusEnum {
     SUCCESS(200, "成功"),
     BAD_REQUEST(400, "请求无效"),
+    NOT_FOUND(404, "请求不存在"),
     INTERNAL_SERVER_ERROR(500, "服务器错误"),
     NOT_VALID_PARAM(40005, "参数无效"),
     NOT_SUPPORTED_OPERATION(40006, "操作不支持"),

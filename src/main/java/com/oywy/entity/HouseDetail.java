@@ -6,7 +6,7 @@ public class HouseDetail {
   private String layoutDesc;
   private String traffic;
   private String roundService;
-  private Long rentWay;
+    private Integer rentWay;
   private String address;
   private Long subwayLineId;
   private String subwayLineName;
@@ -54,11 +54,11 @@ public class HouseDetail {
     this.roundService = roundService;
   }
 
-  public Long getRentWay() {
+    public Integer getRentWay() {
     return rentWay;
   }
 
-  public void setRentWay(Long rentWay) {
+    public void setRentWay(Integer rentWay) {
     this.rentWay = rentWay;
   }
 

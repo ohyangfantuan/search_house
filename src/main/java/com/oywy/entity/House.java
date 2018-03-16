@@ -1,6 +1,7 @@
 package com.oywy.entity;
 
-import java.sql.Timestamp;
+
+import java.util.Date;
 
 public class House {
     private Long id;
@@ -13,8 +14,8 @@ public class House {
     private Long watchTimes;
     private Long buildYear;
     private Long status;
-    private java.sql.Timestamp createTime;
-    private java.sql.Timestamp lastUpdateTime;
+    private Date createTime;
+    private Date lastUpdateTime;
     private String cityEnName;
     private String regionEnName;
     private String cover;
@@ -106,19 +107,19 @@ public class House {
         this.status = status;
     }
 
-    public Timestamp getCreateTime() {
+    public Date getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(Timestamp createTime) {
+    public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
 
-    public Timestamp getLastUpdateTime() {
+    public Date getLastUpdateTime() {
         return lastUpdateTime;
     }
 
-    public void setLastUpdateTime(Timestamp lastUpdateTime) {
+    public void setLastUpdateTime(Date lastUpdateTime) {
         this.lastUpdateTime = lastUpdateTime;
     }
 

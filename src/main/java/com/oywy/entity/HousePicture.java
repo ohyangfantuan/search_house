@@ -4,8 +4,8 @@ public class HousePicture {
   private Long id;
   private Long houseId;
   private String cdnPrefix;
-  private Long width;
-  private Long height;
+    private Integer width;
+    private Integer height;
   private String location;
   private String path;
 
@@ -33,19 +33,19 @@ public class HousePicture {
     this.cdnPrefix = cdnPrefix;
   }
 
-  public Long getWidth() {
+    public Integer getWidth() {
     return width;
   }
 
-  public void setWidth(Long width) {
+    public void setWidth(Integer width) {
     this.width = width;
   }
 
-  public Long getHeight() {
+    public Integer getHeight() {
     return height;
   }
 
-  public void setHeight(Long height) {
+    public void setHeight(Integer height) {
     this.height = height;
   }
 
