@@ -1,4 +1,4 @@
-package com.oywy.core.common;
+package com.oywy.core.reponse;
 
 /**
  * 七牛云oss接口返回

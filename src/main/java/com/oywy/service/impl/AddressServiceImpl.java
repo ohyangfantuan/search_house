@@ -10,7 +10,8 @@ import com.oywy.mapper.SubWayMapper;
 import com.oywy.mapper.SubWayStationMapper;
 import com.oywy.mapper.SupportAddressMapper;
 import com.oywy.service.AddressService;
-import com.oywy.service.ServiceMultiResult;
+import com.oywy.service.result.ServiceMultiResult;
+import com.oywy.service.result.ServiceResult;
 import com.oywy.web.dto.SubwayDTO;
 import com.oywy.web.dto.SubwayStationDTO;
 import com.oywy.web.dto.SupportAddressDTO;
@@ -123,5 +124,38 @@ public class AddressServiceImpl implements AddressService {
             return subwayStationDTO;
         }).collect(Collectors.toList());
         return result;
+    }
+
+    @Override
+    public ServiceResult<SubwayDTO> findSubway(Long subwayId) {
+        if (subwayId == null) {
+            return ServiceResult.notFound();
+        }
+        //根据id查询
+        Subway subway = subWayMapper.selectById(subwayId);
+        if (subway == null) {
+            return ServiceResult.notFound();
+        }
+        //转换成DTO
+        SubwayDTO subwayDTO = new SubwayDTO();
+        BeanUtil.copyProperties(subway, subwayDTO);
+
+        return ServiceResult.success(subwayDTO);
+    }
+
+    @Override
+    public ServiceResult<SubwayStationDTO> findSubwayStation(Long stationId) {
+        if (stationId == null) {
+            return ServiceResult.notFound();
+        }
+        //根据id查询
+        SubwayStation station = subWayStationMapper.selectById(stationId);
+        if (station == null) {
+            return ServiceResult.notFound();
+        }
+        //转换成DTO
+        SubwayStationDTO subwayStationDTO = new SubwayStationDTO();
+        BeanUtil.copyProperties(station, subwayStationDTO);
+        return ServiceResult.success(subwayStationDTO);
     }
 }

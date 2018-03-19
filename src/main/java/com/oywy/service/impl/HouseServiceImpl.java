@@ -10,8 +10,8 @@ import com.oywy.core.security.SecurityUtil;
 import com.oywy.entity.*;
 import com.oywy.mapper.*;
 import com.oywy.service.HouseService;
-import com.oywy.service.ServiceMultiResult;
-import com.oywy.service.ServiceResult;
+import com.oywy.service.result.ServiceMultiResult;
+import com.oywy.service.result.ServiceResult;
 import com.oywy.web.dto.HouseDTO;
 import com.oywy.web.dto.HouseDetailDTO;
 import com.oywy.web.dto.HousePictureDTO;
@@ -41,6 +41,8 @@ public class HouseServiceImpl implements HouseService {
     private HousePictureMapper housePictureMapper;
     @Autowired
     private HouseTagMapper HouseTagMapper;
+    @Autowired
+    private HouseSubscribeMapper houseSubscribeMapper;
     @Autowired
     private SubWayMapper subWayMapper;
     @Autowired
@@ -108,7 +110,7 @@ public class HouseServiceImpl implements HouseService {
 
     @Override
     public ServiceMultiResult<HouseDTO> adminQuery(DataTableSearch dataTableSearch) {
-        //查询
+        //分页条件
         int start = dataTableSearch.getStart();
         int length = dataTableSearch.getLength();
         String orderBy = dataTableSearch.getOrderBy();
@@ -119,7 +121,20 @@ public class HouseServiceImpl implements HouseService {
                 .setSize(length)
                 .setOrderByField(StrUtil.toUnderlineCase(orderBy))
                 .setAsc("asc".equals(direction));
-        List<House> houses = houseMapper.selectPage(page, new EntityWrapper<House>());
+        //查询条件
+        EntityWrapper<House> wrapper = new EntityWrapper<>();
+        //城市
+        wrapper.eq(StrUtil.isNotBlank(dataTableSearch.getCity()), "city_en_name", dataTableSearch.getCity());
+        //状态
+        wrapper.eq(ObjectUtil.isNotNull(dataTableSearch.getStatus()), "status", dataTableSearch.getStatus());
+        //时间上限
+        wrapper.le(ObjectUtil.isNotNull(dataTableSearch.getCreateTimeMax()), "create_time", dataTableSearch.getCreateTimeMax());
+        //时间下限
+        wrapper.ge(ObjectUtil.isNotNull(dataTableSearch.getCreateTimeMin()), "create_time", dataTableSearch.getCreateTimeMin());
+        //标题
+        wrapper.like(StrUtil.isNotBlank(dataTableSearch.getTitle()), "title", dataTableSearch.getTitle());
+        //查询
+        List<House> houses = houseMapper.selectPage(page, wrapper);
         //转换DTO
         List<HouseDTO> houseDTOs = houses.stream().map(house -> {
             HouseDTO houseDTO = new HouseDTO();
@@ -128,6 +143,47 @@ public class HouseServiceImpl implements HouseService {
             return houseDTO;
         }).collect(Collectors.toList());
         return new ServiceMultiResult<>(page.getTotal(), houseDTOs);
+    }
+
+    @Override
+    public ServiceResult<HouseDTO> findCompleteOne(Long id) {
+        //获取房源
+        House house = houseMapper.selectById(id);
+        //获取房源信息
+        HouseDetail detail = houseDetailMapper.selectList(new EntityWrapper<HouseDetail>().eq("house_id", id)).get(0);
+        //获取图片
+        List<HousePicture> pictures = housePictureMapper.selectList(new EntityWrapper<HousePicture>().eq("house_id", id));
+        //获取标签
+        List<HouseTag> tags = HouseTagMapper.selectList(new EntityWrapper<HouseTag>().eq("house_id", id));
+        //转成DTO
+        HouseDTO houseDTO = new HouseDTO();
+        BeanUtil.copyProperties(house, houseDTO);
+
+        HouseDetailDTO houseDetailDTO = new HouseDetailDTO();
+        BeanUtil.copyProperties(detail, houseDetailDTO);
+
+        List<HousePictureDTO> housePictureDTOS = pictures.stream().map(picture -> {
+            HousePictureDTO housePictureDTO = new HousePictureDTO();
+            BeanUtil.copyProperties(picture, housePictureDTO);
+            return housePictureDTO;
+        }).collect(Collectors.toList());
+
+        List<String> tagList = tags.stream().map(tag -> tag.getName()).collect(Collectors.toList());
+
+        houseDTO.setHouseDetail(houseDetailDTO);
+        houseDTO.setPictures(housePictureDTOS);
+        houseDTO.setTags(tagList);
+
+        if (SecurityUtil.currentUserId() > 0) { // 已登录用户
+            List<HouseSubscribe> subscribies = houseSubscribeMapper.selectList(
+                    new EntityWrapper<HouseSubscribe>()
+                            .eq("user_id", SecurityUtil.currentUserId())
+                            .eq("house_id", house.getId()));
+            if (CollUtil.isNotEmpty(subscribies))
+                houseDTO.setSubscribeStatus(subscribies.get(0).getStatus());
+        }
+
+        return ServiceResult.success(houseDTO);
     }
 
     /**

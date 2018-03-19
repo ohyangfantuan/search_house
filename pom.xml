@@ -27,9 +27,16 @@
         <hutool>4.0.7</hutool>
         <qiniu>[7.2.0, 7.2.99]</qiniu>
         <logstash-logback-encoder>4.9</logstash-logback-encoder>
+        <elasticsearch>2.2.0</elasticsearch>
     </properties>
 
     <dependencies>
+        <!-- ElasticSearch -->
+        <dependency>
+            <groupId>org.elasticsearch</groupId>
+            <artifactId>elasticsearch</artifactId>
+            <version>${elasticsearch}</version>
+        </dependency>
         <!--七牛云 -->
         <dependency>
             <groupId>com.qiniu</groupId>

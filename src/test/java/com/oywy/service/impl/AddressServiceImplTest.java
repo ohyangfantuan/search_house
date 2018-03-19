@@ -2,12 +2,10 @@ package com.oywy.service.impl;
 
 import com.oywy.SearchhouseApplicationTests;
 import com.oywy.service.AddressService;
-import com.oywy.service.ServiceMultiResult;
+import com.oywy.service.result.ServiceMultiResult;
 import com.oywy.web.dto.SupportAddressDTO;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by oywy on 2018/3/16.

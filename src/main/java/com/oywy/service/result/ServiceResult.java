@@ -1,4 +1,4 @@
-package com.oywy.service;
+package com.oywy.service.result;
 
 /**
  * 单行记录返回
@@ -18,6 +18,16 @@ public class ServiceResult<T> {
     public ServiceResult(boolean success, String message) {
         this.success = success;
         this.message = message;
+    }
+
+    public static <T> ServiceResult<T> success(T result) {
+        ServiceResult<T> serviceResult = new ServiceResult<>(true);
+        serviceResult.setResult(result);
+        return serviceResult;
+    }
+
+    public static <T> ServiceResult<T> notFound() {
+        return new ServiceResult<>(false, "资源不存在");
     }
 
     public ServiceResult(boolean success) {

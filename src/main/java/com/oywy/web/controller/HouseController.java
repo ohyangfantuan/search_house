@@ -1,10 +1,10 @@
 package com.oywy.web.controller;
 
 import cn.hutool.core.collection.CollUtil;
-import com.oywy.core.common.ApiResponse;
+import com.oywy.core.reponse.ApiResponse;
 import com.oywy.core.enumeration.ResponseStatusEnum;
 import com.oywy.service.AddressService;
-import com.oywy.service.ServiceMultiResult;
+import com.oywy.service.result.ServiceMultiResult;
 import com.oywy.web.dto.SubwayDTO;
 import com.oywy.web.dto.SubwayStationDTO;
 import com.oywy.web.dto.SupportAddressDTO;

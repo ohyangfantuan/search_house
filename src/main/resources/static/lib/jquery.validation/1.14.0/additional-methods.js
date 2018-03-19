@@ -80,7 +80,7 @@ $.validator.addMethod("alphanumeric", function(value, element) {
 /*
  * Dutch bank account numbers (not 'giro' numbers) have 9 digits
  * and pass the '11 check'.
- * We accept the notation with spaces, as that is common.
+ * We accept the notation with spaces, as that is reponse.
  * acceptable: 123456789 or 12 34 56 789
  */
 $.validator.addMethod("bankaccountNL", function(value, element) {

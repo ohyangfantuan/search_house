@@ -1,6 +1,8 @@
 package com.oywy.service;
 
 import com.oywy.core.enumeration.CityLevelEnum;
+import com.oywy.service.result.ServiceMultiResult;
+import com.oywy.service.result.ServiceResult;
 import com.oywy.web.dto.SubwayDTO;
 import com.oywy.web.dto.SubwayStationDTO;
 import com.oywy.web.dto.SupportAddressDTO;
@@ -21,4 +23,8 @@ public interface AddressService {
     List<SubwayDTO> findAllSubwayByCity(String cityEnName);
 
     List<SubwayStationDTO> findAllStationBySubway(Long subwayId);
+
+    ServiceResult<SubwayDTO> findSubway(Long subwayId);
+
+    ServiceResult<SubwayStationDTO> findSubwayStation(Long stationId);
 }

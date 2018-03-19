@@ -1,6 +1,6 @@
 package com.oywy.core.handler;
 
-import com.oywy.core.common.ApiResponse;
+import com.oywy.core.reponse.ApiResponse;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

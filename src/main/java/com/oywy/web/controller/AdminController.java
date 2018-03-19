@@ -3,14 +3,15 @@ package com.oywy.web.controller;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
-import com.oywy.core.common.ApiDataTableResponse;
-import com.oywy.core.common.ApiResponse;
-import com.oywy.core.common.QiniuResponse;
+import com.oywy.core.reponse.ApiDataTableResponse;
+import com.oywy.core.reponse.ApiResponse;
+import com.oywy.core.reponse.QiniuResponse;
 import com.oywy.core.enumeration.CityLevelEnum;
 import com.oywy.core.enumeration.ResponseStatusEnum;
 import com.oywy.service.*;
-import com.oywy.web.dto.HouseDTO;
-import com.oywy.web.dto.SupportAddressDTO;
+import com.oywy.service.result.ServiceMultiResult;
+import com.oywy.service.result.ServiceResult;
+import com.oywy.web.dto.*;
 import com.oywy.web.form.DataTableSearch;
 import com.oywy.web.form.HouseForm;
 import com.qiniu.http.Response;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -141,6 +143,37 @@ public class AdminController {
             return ApiResponse.success(result.getResult());
         //添加失败
         return ApiResponse.status(ResponseStatusEnum.NOT_VALID_PARAM);
+    }
+
+    /**
+     * 编辑房源页面
+     *
+     * @return
+     */
+    @GetMapping("/house/edit")
+    public String houseEditPage(Long id, Model model) {
+        if (ObjectUtil.isNull(id))
+            return "error";
+        ServiceResult<HouseDTO> serviceResult = houseService.findCompleteOne(id);
+        if (!serviceResult.isSuccess())
+            return "error";
+        HouseDTO result = serviceResult.getResult();
+        model.addAttribute("house", result);
+
+        Map<CityLevelEnum, SupportAddressDTO> cityAndRegion = addressService.findCityAndRegion(result.getCityEnName(), result.getRegionEnName());
+        model.addAttribute("city", cityAndRegion.get(CityLevelEnum.CITY));
+        model.addAttribute("region", cityAndRegion.get(CityLevelEnum.REGION));
+
+        HouseDetailDTO houseDetail = result.getHouseDetail();
+        ServiceResult<SubwayDTO> serviceSubwayResult = addressService.findSubway(houseDetail.getSubwayLineId());
+        if (!serviceSubwayResult.isSuccess())
+            return "error";
+        model.addAttribute("subway", serviceSubwayResult.getResult());
+        ServiceResult<SubwayStationDTO> serviceStationResult = addressService.findSubwayStation(houseDetail.getSubwayStationId());
+        if (!serviceStationResult.isSuccess())
+            return "error";
+        model.addAttribute("station", serviceStationResult.getResult());
+        return PREFIX + "house-edit";
     }
 
     /**

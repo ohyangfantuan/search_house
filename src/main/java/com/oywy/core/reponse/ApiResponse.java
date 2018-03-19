@@ -1,4 +1,4 @@
-package com.oywy.core.common;
+package com.oywy.core.reponse;
 
 import com.oywy.core.enumeration.ResponseStatusEnum;
 

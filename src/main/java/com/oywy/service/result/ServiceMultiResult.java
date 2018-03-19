@@ -1,4 +1,4 @@
-package com.oywy.service;
+package com.oywy.service.result;
 
 import cn.hutool.core.util.ObjectUtil;
 

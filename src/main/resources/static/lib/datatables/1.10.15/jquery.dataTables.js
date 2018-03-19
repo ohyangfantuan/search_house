@@ -830,7 +830,7 @@
 		
 		
 		/**
-		 * Provide a common method for plug-ins to check the version of DataTables being used, in order
+         * Provide a reponse method for plug-ins to check the version of DataTables being used, in order
 		 * to ensure compatibility.
 		 *  @param {string} sVersion Version string to check for, in the format "X.Y.Z". Note that the
 		 *    formats "X" and "X.Y" are also acceptable.
@@ -9085,7 +9085,7 @@
 	
 	
 	/**
-	 * Provide a common method for plug-ins to check the version of DataTables being
+     * Provide a reponse method for plug-ins to check the version of DataTables being
 	 * used, in order to ensure compatibility.
 	 *
 	 *  @param {string} version Version string to check for, in the format "X.Y.Z".

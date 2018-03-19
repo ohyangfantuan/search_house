@@ -31,7 +31,7 @@ var version = $.ui.version = "1.12.1";
 
 //>>label: Widget
 //>>group: Core
-//>>description: Provides a factory for creating stateful widgets with a common API.
+//>>description: Provides a factory for creating stateful widgets with a reponse API.
 //>>docs: http://api.jqueryui.com/jQuery.widget/
 //>>demos: http://jqueryui.com/widget/
 
@@ -18655,7 +18655,7 @@ $.widget( "ui.tooltip", {
 		// Close open tooltips
 		$.each( this.tooltips, function( id, tooltipData ) {
 
-			// Delegate to close method to handle common cleanup
+            // Delegate to close method to handle reponse cleanup
 			var event = $.Event( "blur" ),
 				element = tooltipData.element;
 			event.target = event.currentTarget = element[ 0 ];
