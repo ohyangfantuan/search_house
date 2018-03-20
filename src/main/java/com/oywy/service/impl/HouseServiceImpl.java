@@ -10,6 +10,7 @@ import com.oywy.core.security.SecurityUtil;
 import com.oywy.entity.*;
 import com.oywy.mapper.*;
 import com.oywy.service.HouseService;
+import com.oywy.service.SearchService;
 import com.oywy.service.result.ServiceMultiResult;
 import com.oywy.service.result.ServiceResult;
 import com.oywy.web.dto.HouseDTO;
@@ -17,14 +18,13 @@ import com.oywy.web.dto.HouseDetailDTO;
 import com.oywy.web.dto.HousePictureDTO;
 import com.oywy.web.form.DataTableSearch;
 import com.oywy.web.form.HouseForm;
+import com.oywy.web.form.RentSearch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -47,6 +47,8 @@ public class HouseServiceImpl implements HouseService {
     private SubWayMapper subWayMapper;
     @Autowired
     private SubWayStationMapper subWayStationMapper;
+    @Autowired
+    private SearchService searchService;
     @Value("${qiniu.cdn.prefix}")
     private String cdnPrefix;
 
@@ -186,6 +188,20 @@ public class HouseServiceImpl implements HouseService {
         return ServiceResult.success(houseDTO);
     }
 
+    @Override
+    public ServiceMultiResult<HouseDTO> query(RentSearch rentSearch) {
+        if (rentSearch.getKeywords() != null && !rentSearch.getKeywords().isEmpty()) {
+            ServiceMultiResult<Long> serviceResult = searchService.query(rentSearch);
+            if (serviceResult.getTotal() == 0) {
+                return new ServiceMultiResult<>(0, new ArrayList<>());
+            }
+
+            return new ServiceMultiResult<>(serviceResult.getTotal(), wrapperHouseResult(serviceResult.getResult()));
+        }
+
+        return null;
+    }
+
     /**
      * 房源信息属性填充
      *
@@ -240,4 +256,53 @@ public class HouseServiceImpl implements HouseService {
         }).collect(Collectors.toList());
         return pictures;
     }
+
+    /**
+     * 房源填充
+     *
+     * @param houseIds
+     * @return
+     */
+    private List<HouseDTO> wrapperHouseResult(List<Long> houseIds) {
+        List<HouseDTO> result = new ArrayList<>();
+
+        Map<Long, HouseDTO> idToHouseMap = new HashMap<>();
+        List<House> houses = houseMapper.selectBatchIds(houseIds);
+        houses.forEach(house -> {
+            HouseDTO houseDTO = new HouseDTO();
+            BeanUtil.copyProperties(house, houseDTO);
+            idToHouseMap.put(house.getId(), houseDTO);
+        });
+
+        wrapperHouseList(houseIds, idToHouseMap);
+
+        // 矫正顺序
+        for (Long houseId : houseIds) {
+            result.add(idToHouseMap.get(houseId));
+        }
+        return result;
+    }
+
+    /**
+     * 渲染详细信息 及 标签
+     *
+     * @param houseIds
+     * @param idToHouseMap
+     */
+    private void wrapperHouseList(List<Long> houseIds, Map<Long, HouseDTO> idToHouseMap) {
+        List<HouseDetail> details = houseDetailMapper.selectBatchIds(houseIds);
+        details.forEach(houseDetail -> {
+            HouseDTO houseDTO = idToHouseMap.get(houseDetail.getHouseId());
+            HouseDetailDTO houseDetailDTO = new HouseDetailDTO();
+            BeanUtil.copyProperties(houseDetail, houseDetailDTO);
+            houseDTO.setHouseDetail(houseDetailDTO);
+        });
+
+        List<HouseTag> houseTags = HouseTagMapper.selectBatchIds(houseIds);
+        houseTags.forEach(houseTag -> {
+            HouseDTO house = idToHouseMap.get(houseTag.getHouseId());
+            house.getTags().add(houseTag.getName());
+        });
+    }
+
 }

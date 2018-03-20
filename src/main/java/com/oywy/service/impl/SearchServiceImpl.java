@@ -3,6 +3,7 @@ package com.oywy.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.google.common.primitives.Longs;
 import com.oywy.entity.House;
 import com.oywy.entity.HouseDetail;
 import com.oywy.entity.HouseTag;
@@ -10,8 +11,10 @@ import com.oywy.mapper.HouseDetailMapper;
 import com.oywy.mapper.HouseMapper;
 import com.oywy.mapper.HouseTagMapper;
 import com.oywy.service.SearchService;
+import com.oywy.service.result.ServiceMultiResult;
 import com.oywy.service.search.HouseIndexKey;
 import com.oywy.service.search.HouseIndexTemplate;
+import com.oywy.web.form.RentSearch;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -19,12 +22,16 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.rest.RestStatus;
+import org.elasticsearch.search.sort.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -129,5 +136,25 @@ public class SearchServiceImpl implements SearchService {
         String id = response.getHits().getAt(0).getId();
         DeleteResponse deleteResponse = esClient.prepareDelete(INDEX_NAME, INDEX_TYPE, id).get();
         System.out.println(deleteResponse.isFound());
+    }
+
+    @Override
+    public ServiceMultiResult<Long> query(RentSearch rentSearch) {
+        BoolQueryBuilder queryBuilder = new BoolQueryBuilder();
+        queryBuilder.filter(QueryBuilders.termQuery(HouseIndexKey.CITY_EN_NAME, rentSearch.getCityEnName()));
+        if ("*".equals(rentSearch.getRegionEnName()))
+            queryBuilder.filter(QueryBuilders.termQuery(HouseIndexKey.REGION_EN_NAME, rentSearch.getRegionEnName()));
+        SearchResponse response = esClient.prepareSearch(INDEX_NAME).setTypes(INDEX_TYPE)
+                .setQuery(queryBuilder)//查询条件
+                .addSort(rentSearch.getOrderBy(), SortOrder.DESC)//排序
+                .setFrom(rentSearch.getStart()).setSize(rentSearch.getSize())//最多一百条记录
+                .get();
+        if (response.status() != RestStatus.OK) {
+            logger.warn("query status is not ok:" + queryBuilder);
+            return new ServiceMultiResult<>(0, null);
+        }
+        LinkedList<Long> houseIds = new LinkedList<>();
+        response.getHits().forEach(hit -> houseIds.add(Longs.tryParse(String.valueOf(hit.getSource().get(HouseIndexKey.HOUSE_ID)))));
+        return new ServiceMultiResult<>(response.getHits().getTotalHits(), houseIds);
     }
 }

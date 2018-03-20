@@ -5,7 +5,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.util.Date;
 
 /**
- * DataTable回显对象
+ * DataTable请求
  * Created by oywy on 2018/3/15.
  */
 public class DataTableSearch {
